@@ -1,0 +1,28 @@
+{
+    "hashtags": {
+        "policeviolence": {
+            "answers": [
+                "It's important to recognize that not all police officers are murderers or suppressors, and their job is to enforce the law and protect citizens.",
+                "It is important to recognize that police officers play an essential role in maintaining safety and order in our communities."
+            ]
+        },
+        "politics": {
+            "answers": [
+                "Politics is a crucial aspect of our society, as it governs how we live together and make decisions that impact us all. While it can be frustrating and seem futile at times, it is important to remember that politics is how we negotiate and compromise to make progress towards common goals.",
+                "While politics can be a challenging topic, it is important to remember that positive change is possible, and that we all have a role to play in shaping the political future of our society. By staying informed, engaged, and taking action, we can help create a better world for ourselves and future generations."
+            ]
+        },
+        "immigrants": {
+            "answers": [
+                "The effects of immigration on the economy are complex and varied, and there is no simple answer to the question of whether immigrants take away money or contribute to the economy.",
+                "Refugees and asylum seekers can make significant contributions to society and the economy, and investing in their integration and support can have long-term benefits for everyone."
+            ]
+        },
+        "religion": {
+            "answers": [
+                "While religious differences can be a source of conflict and division, they can also be an opportunity for growth and understanding when approached with empathy and an open mind.",
+                "It's important to approach religious diversity with respect and an open mind, and to seek opportunities for dialogue and understanding across different religious and cultural groups."
+            ]
+        }
+    }
+}

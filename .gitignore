@@ -1,0 +1,7 @@
+/venv
+venv
+venv/
+.env
+*pycache*/
+lovebot.ipynb
+hate_dump.txt
