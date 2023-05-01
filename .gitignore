@@ -6,3 +6,4 @@ venv/
 lovebot.ipynb
 hate_dump.txt
 session.json
+*.txt

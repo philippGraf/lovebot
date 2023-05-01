@@ -3,15 +3,19 @@ import os
 from instagrapi import Client
 import json
 from openai_moderation import OpenAiModerator
+from hashtag_optimizer import HashtagOptimizer
 from time import sleep
 from argparse import ArgumentParser
 from numpy import Inf
 from collections import deque
-from random import choice
+import random
 import pandas as pd
 from utils import login_user
-from random import choice
 
+from read_hashtags import HASHTAG_FILE
+from read_messages import MESSAGE_FILE
+
+HATE_DUMP = "hate_dump.txt"
 
 def main(args):
     """the chat bot loop"""
@@ -30,35 +34,55 @@ def main(args):
     else:
         N_RUNS = abs(args.n_runs)
     RUN = True
-    i = 0
+    loop_counter = 0
     comment = "make love" if not args.comment else args.comment
     # ------------------------------------------------------
     # load the hatespeach detector
     detector = OpenAiModerator(debug=args.debug)
-    # --------------------------------------------------------
-    # load the config with hashtags and possible answers per hashtag etc ....
-    love_config = json.load(open("lovebot_config.json", "r"))
+    # ------------------------------------------------------
+    # load the hashtag optimizer
+    hashtag_optimizer = HashtagOptimizer()
+    # ------------------------------------------------------
+
     hashtag = args.hashtag
-    if hashtag:
-        love_config = {"hashtags": {hashtag: {"answers": [comment]}}}
+
     # media_id buffer
     media_buffer = deque(maxlen=1000)
     ANALYSE_MEDIA = True
     top = True
     while RUN:
-        for hashtag in love_config["hashtags"]:
-            print("**************************************************")
-            print("analysing hashtag: ", hashtag)
-            print("**************************************************")
-            print(f"Getting {N_MEDIA} posts...")
+        # We read hashtags and messages inside the main loop
+        # because other processes are adding both continuously.
+
+        # Get Hashtag
+        if not hashtag:
+            f = open(HASHTAG_FILE, 'r')
+            # Read hashtags from file and remove the trailing '\n'.
+            hashtags = [hashtag[:-1] for hashtag in f.readlines()]
+            f.close()
+            hashtag = hashtag_optimizer.select_hashtag(hashtags)
+
+        # Get all messages from file.
+        f = open(MESSAGE_FILE, 'r')
+        # Read messages from file and remove the trailing '\n'.
+        messages = [message[:-1] for message in f.readlines()]
+        f.close()
+
+        for hashtag in hashtags:
+            os.system('clear')
+            print("[Lovebot]: Ich analysiere den Hashtag: #", hashtag, "\n")
+            sleep(1)
             if top:
+                print(f"[Lovebot]: Ich durchsuche {N_MEDIA} beliebte Beiträge...\n")
                 medias = client.hashtag_medias_top(hashtag, amount=N_MEDIA)
             else:
+                print(f"[Lovebot]: Ich durchsuche {N_MEDIA} aktuelle Beiträge...\n")
                 medias = client.hashtag_medias_recent(
                     hashtag, amount=N_MEDIA
                 )  # here it would be also possible to sample from related hashtags and to scan them also
             top = not top
             for media in medias:
+                ANALYSE_MEDIA = True
                 media_id = client.media_id(media.pk)
                 try:
                     media_buffer.index(media.pk)
@@ -73,33 +97,44 @@ def main(args):
                         .drop_duplicates()
                         .values
                     )  # dropping dulpicates!!!!
+
+                    # Analyse the received comments...
                     analysis = detector.analyse_texts(comments)
-                    any_hate = any([x["results"][0]["flagged"] for x in analysis])
+
+                    any_hate = False
+
                     for j, x in enumerate(analysis):
                         if x["results"][0]["flagged"]:
-                            print("writing possible hate comment to hate_dump.txt...:")
-                            print("--------------------------------------------------")
-                            print(comments[j])
-                            print("--------------------------------------------------")
-                            print("--------------------------------------------------")
-                            with open("hate_dump.txt", "a") as file:
+                            any_hate = True
+                            print("[Lovebot]: Ich habe potenzielle Hassrede gefunden: \n")
+                            print("'",comments[j],"'\n")
+                            sleep(1)
+                            print("[Lovebot]: Ich speichere potenzielle Hassrede unter ", HATE_DUMP, "...\n")
+                            sleep(1)
+                            with open(HATE_DUMP, "a") as file:
                                 file.write(
-                                    "hashtag: " + hashtag + ": " + comments[j] + "\n"
+                                    "Hashtag: " + hashtag + ": " + comments[j] + "\n"
                                 )
+                                file.close()
+                            
+                    # Here, we just comment on the post instead of replying to the actual hate comment. 
+                    # Is this behaviour correct?
                     if any_hate:
-                        comment = choice(love_config["hashtags"][hashtag]["answers"])
-                        print(
-                            f"replying to media with id {media_id}, since hate speech was found in comments.\nThe reply is:\n{comment} "
-                        )
+                        comment = random.choice(messages)
+                        print("[Lovebot]: Ich sende eine Liebesbotschaft unter dem Beitrag,\n",
+                              "           bei dem ich potenzielle Hassrede gefunden habe.\n")
+                        sleep(1)
+                        print("[Lovebot]: Ich sende die folgende Liebesbotschaft:\n")
+                        sleep(1)
+                        print("'",comment,"'\n")
+                        for loop_counter in range(0,100,5):
+                            print(f"[Lovebot]: Liebesbotschaft senden [{loop_counter} %]", end="\r")
+                            sleep(random.random()*0.3)
                         client.media_comment(media_id=media_id, text=comment)
-
-                ANALYSE_MEDIA = True
-                media
-
-        i += 1
-        if i >= N_RUNS:
+                        print("[Lovebot]: Liebesbotschaft senden [100 %]\n")
+        loop_counter += 1
+        if loop_counter >= N_RUNS:
             RUN = False
-
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -111,3 +146,9 @@ if __name__ == "__main__":
     parser.add_argument("--comment", type=str, default=None)
     args = parser.parse_args()
     main(args)
+    # while True:
+    #     try:
+    #         main(args)
+    #     except Exception as e:
+    #         print(e)
+    #         sleep(30)
