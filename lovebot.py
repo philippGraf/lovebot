@@ -70,7 +70,7 @@ def main(args):
         f.close()
 
         os.system('clear')
-        print("[Lovebot]: Ich analysiere den Hashtag: #", selected_hashtag, "\n")
+        print("[Lovebot]: Ich analysiere den Hashtag: ", "#"+selected_hashtag, "\n")
         sleep(1)
         if top:
             print(f"[Lovebot]: Ich durchsuche {N_MEDIA} beliebte Beiträge...\n")
