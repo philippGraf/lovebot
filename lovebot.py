@@ -44,6 +44,8 @@ def main(args):
     USERNAME = os.getenv("INSTA_USER")
     PASSWORD = os.getenv("INSTA_PWD")
     client = Client()
+    # adds a random delay between 2 and 4 seconds after each request
+    client.delay_range = [2,4]
     client.login(USERNAME, PASSWORD)
     # -----------------------------------------------------
     # runtime arguments
