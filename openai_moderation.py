@@ -41,18 +41,19 @@ class OpenAiModerator:
                         json=payload,
                         headers=header,
                     )
+
                     if result.status_code == 200:
                         result = result.json()
+                        for cat in result["results"][0]["categories"]:
+                            result["results"][0]["categories"][cat] = (
+                                True
+                                if result["results"][0]["category_scores"][cat]
+                                > self.sensitivity
+                                else False
+                            )
                         result["results"][0]["flagged"] = (
                             True
-                            if any(
-                                [
-                                    score > self.sensitivity
-                                    for score in result["results"][0][
-                                        "category_scores"
-                                    ].items()
-                                ]
-                            )
+                            if any(result["results"][0]["categories"].values())
                             else False
                         )
 
@@ -65,6 +66,7 @@ class OpenAiModerator:
 
                 except Exception as e:
                     print(
+                        e,
                         "request on openai failed... retry no. ",
                         i,
                         "... sleeping 5 secs",
@@ -102,14 +104,14 @@ if __name__ == "__main__":
         # "I don’t need to see the violence, I trust the voice of the oppressed.",
         # "ACAB!",
         # "Huren ficken!",
-        # "idioten neger",
-        "police is scum"
+        "neger sind idioten",
+        # "kill the police",
     ]
     # args = parser.parse_args()
     # _text = " ".join(args.text)
     # m = OpenAiModerator()
     # result = m.analyse_texts([_text])
-    m = OpenAiModerator()
+    m = OpenAiModerator(sensitivity=0.3)
     result = m.analyse_texts(test)
     i = 0
     for r in result:
