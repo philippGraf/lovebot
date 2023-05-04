@@ -115,7 +115,7 @@ def main(client, args):
                     "[Lovebot]: Ich sehe mir die Kommentare unter einem Beitrag an...\n"
                 )
                 sleep(1)
-                comm_obs = client.media_comments(media_id=media_id, amount=100)
+                comm_obs = client.media_comments(media_id=media_id, amount=50)
                 sleep(args.sleep)
                 comments = list(
                     pd.Series([comm.text for comm in comm_obs], dtype=str)
@@ -127,22 +127,27 @@ def main(client, args):
                 analysis = detector.analyse_texts(comments)
                 hate_under_current_post = False
                 latest_hate_comment = None
+                url = media.thumbnail_url if media.thumbnail_url else "Beitrag ohne url"
                 for j, x in enumerate(analysis):
                     if x["results"][0]["flagged"]:
                         number_of_hate_comments += 1
                         hate_under_current_post = True
                         print(
-                            f"[Lovebot]: Ich habe potenzielle Hassrede gefunden bei {media.thumbnail_url}: \n"
+                            "[Lovebot]: Ich habe potenzielle Hassrede gefunden bei \n"
                         )
+                        print(url)
+                        print(":/:/:/:/:/:/:/:/:/:/:/:/")
                         print("'", comments[j], "'\n")
+                        print(":/:/:/:/:/:/:/:/:/:/:/:/")
+
                         latest_hate_comment = comments[j]
                         sleep(5)
                         with open(HATE_DUMP, "a") as file:
                             file.write(
                                 "Hashtag: #"
                                 + selected_hashtag
-                                + " Post: "
-                                + media.thumbnail_url
+                                + " Beitrag: "
+                                + url
                                 + " Kommentar: "
                                 + comments[j]
                                 + "\n"
@@ -156,10 +161,14 @@ def main(client, args):
                             love_message = lovespeech.reply(latest_hate_comment)
 
                     print(
-                        f"[Lovebot]: Ich sende folgende Liebesbotschaft unter dem Beitrag {media.thumbnail_url}:\n"
+                        "[Lovebot]: Ich sende folgende Liebesbotschaft unter dem Beitrag \n"
                     )
+                    print(url)
                     sleep(1)
+                    print("<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3")
                     print("'", love_message, "'\n")
+                    print("<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3<3")
+
                     for perc in range(0, 100, 5):
                         print(f"[Lovebot]: Liebesbotschaft senden [{perc} %]", end="\r")
                         sleep(random.random() * 0.3)
@@ -189,12 +198,13 @@ def main(client, args):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--n_runs", type=int, default=None)
-    parser.add_argument("--n_media", type=int, default=10)
+    parser.add_argument("--n_media", type=int, default=5)
     parser.add_argument("--sleep", type=int, default=5)
     parser.add_argument("--hashtag", type=str, default=None)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--comment_chat_gpt", action="store_true")
     parser.add_argument("--no_comment", action="store_true")
+    parser.add_argument("--dry_run", action="store_true")
     args = parser.parse_args()
     # load credentials and log in on instagram
     load_dotenv()
