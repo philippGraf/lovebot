@@ -158,11 +158,11 @@ def main(client, args):
                     print("[Lovebot]: Ich habe keine Hassrede gefunden...\n")
                     sleep(1)
 
-            print("[Lovebot]: Ich aktualisiere den Hashtag-Optimierer...\n")
-            hashtag_optimizer.update(
-                all_hashtags, selected_hashtag, (number_of_hate_comments/N_MEDIA)
-            )
-            sleep(1)
+        print("[Lovebot]: Ich aktualisiere den Hashtag-Optimierer...\n")
+        hashtag_optimizer.update(
+            all_hashtags, selected_hashtag, (number_of_hate_comments/N_MEDIA)
+        )
+        sleep(1)
 
         loop_counter += 1
         if loop_counter >= N_RUNS:
@@ -190,4 +190,5 @@ if __name__ == "__main__":
     try:
         main(client, args)
     except KeyboardInterrupt:
+        print("[Lovebot]: Ich melde mich ab. Bis bald :)\n")
         client.logout()
