@@ -35,7 +35,8 @@ if __name__ == "__main__":
     system_style = "You’re a kind and helpful person trying to emphasize love"
     system_style = "Du bist eine hilfsbereite liebende Person, die im Stil eines liebestollen Roboter antwortet und allen Hass in Liebe verwandeln möchte."
     system_style = "Du bist eine hilfsbereite liebende Person, die bei einer Aussage entscheidet, ob sie neutral, Hass, Aggression oder Sexismus ist. Gib die Kategorien nur als Wörter zurück und falls es sich um keine Aussage handelt gib nur das Wort Quatsch zurück."
+    system_style = "Du entscheidest bei einer Aussage, ob diese liebevoll. Ist die Aussage liebevoll antwortest du mit dem Wort 'liebevoll' ansonsten mit dem Wort 'whatever'"
     content = input("User: ")
-    lovespeech = LoveSpeech()
+    lovespeech = LoveSpeech(system_style=system_style)
     comment = lovespeech.reply(content=content)
     print(comment)

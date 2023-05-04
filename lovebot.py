@@ -164,7 +164,7 @@ def main(client, args):
                         print(
                             "[Lovebot]: Liebesbotschaft senden fehlgeschlagen. Das hat leider nicht geklappt :(\n"
                         )
-                    sleep(1)
+                    sleep(10)
                 else:
                     print("[Lovebot]: Ich habe keine Hassrede gefunden...\n")
                     sleep(1)
