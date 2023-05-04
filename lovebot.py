@@ -49,7 +49,7 @@ def main(client, args):
         N_RUNS = abs(args.n_runs)
 
     loop_counter = 0
-
+    number_of_hashtags = 0
     # ------------------------------------------------------
     # load the hatespeach detector
     detector = OpenAiModerator(debug=args.debug)
@@ -74,8 +74,14 @@ def main(client, args):
             # Read hashtags from file and remove the trailing '\n'.
             all_hashtags = [hashtag[:-1] for hashtag in f.readlines()]
             f.close()
-            # Let the hashtag optimizer select a hashtag.
-            selected_hashtag = hashtag_optimizer.select_hashtag(all_hashtags)
+
+            if len(all_hashtags) > number_of_hashtags:
+                # A new hashtag was added. Select the latest hashtag.
+                selected_hashtag = all_hashtags[-1]
+            else:
+                # Let the hashtag optimizer select a hashtag.
+                selected_hashtag = hashtag_optimizer.select_hashtag(all_hashtags)
+            number_of_hashtags = len(all_hashtags)
 
         # Get all messages from file.
         f = open(MESSAGE_FILE, "r")
