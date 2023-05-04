@@ -33,6 +33,7 @@ if not os.path.exists(os.path.join(os.path.dirname(__file__), MESSAGE_FILE)):
     f.write("Make Love not Hate!" + "\n")
     f.close()
 
+
 def main(client, args):
     """the chat bot loop"""
     # -----------------------------------------------------
@@ -46,7 +47,7 @@ def main(client, args):
         N_RUNS = Inf
     else:
         N_RUNS = abs(args.n_runs)
-    
+
     loop_counter = 0
 
     # ------------------------------------------------------
@@ -104,7 +105,9 @@ def main(client, args):
             except ValueError as e:
                 media_buffer.append(media.pk)
             if ANALYSE_MEDIA:
-                print("[Lovebot]: Ich sehe mir die Kommentare unter einem Beitrag an...\n")
+                print(
+                    "[Lovebot]: Ich sehe mir die Kommentare unter einem Beitrag an...\n"
+                )
                 sleep(1)
                 comm_obs = client.media_comments(media_id=media_id, amount=100)
                 sleep(args.sleep)
@@ -122,27 +125,33 @@ def main(client, args):
                     if x["results"][0]["flagged"]:
                         number_of_hate_comments += 1
                         hate_under_current_post = True
-                        print("[Lovebot]: Ich habe potenzielle Hassrede gefunden: \n")
+                        print(
+                            f"[Lovebot]: Ich habe potenzielle Hassrede gefunden bei {media.thumbnail_url}: \n"
+                        )
                         print("'", comments[j], "'\n")
                         latest_hate_comment = comments[j]
                         sleep(5)
                         with open(HATE_DUMP, "a") as file:
                             file.write(
-                                "Hashtag: "
+                                "Hashtag: #"
                                 + selected_hashtag
-                                + ": "
+                                + " Post: "
+                                + media.thumbnail_url
+                                + " Kommentar: "
                                 + comments[j]
                                 + "\n"
                             )
                             file.close()
 
-                if hate_under_current_post:
+                if hate_under_current_post and (not args.no_comment):
                     love_message = random.choice(messages)
                     if args.comment_chat_gpt:
                         if args.comment_chat_gpt:
                             love_message = lovespeech.reply(latest_hate_comment)
 
-                    print("[Lovebot]: Ich sende folgende Liebesbotschaft unter dem Beitrag:\n")
+                    print(
+                        f"[Lovebot]: Ich sende folgende Liebesbotschaft unter dem Beitrag {media.thumbnail_url}:\n"
+                    )
                     sleep(1)
                     print("'", love_message, "'\n")
                     for perc in range(0, 100, 5):
@@ -152,7 +161,9 @@ def main(client, args):
                         client.media_comment(media_id=media_id, text=love_message)
                         print("[Lovebot]: Liebesbotschaft senden [100 %]\n")
                     except:
-                        print("[Lovebot]: Liebesbotschaft senden fehlgeschlagen. Das hat leider nicht geklappt :(\n")
+                        print(
+                            "[Lovebot]: Liebesbotschaft senden fehlgeschlagen. Das hat leider nicht geklappt :(\n"
+                        )
                     sleep(1)
                 else:
                     print("[Lovebot]: Ich habe keine Hassrede gefunden...\n")
@@ -160,7 +171,7 @@ def main(client, args):
 
         print("[Lovebot]: Ich aktualisiere den Hashtag-Optimierer...\n")
         hashtag_optimizer.update(
-            all_hashtags, selected_hashtag, (number_of_hate_comments/N_MEDIA)
+            all_hashtags, selected_hashtag, (number_of_hate_comments / N_MEDIA)
         )
         sleep(1)
 
@@ -177,6 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--hashtag", type=str, default=None)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--comment_chat_gpt", action="store_true")
+    parser.add_argument("--no_comment", action="store_true")
     args = parser.parse_args()
     # load credentials and log in on instagram
     load_dotenv()
@@ -184,9 +196,9 @@ if __name__ == "__main__":
     PASSWORD = os.getenv("INSTA_PWD")
     client = Client()
     # adds a random delay between 2 and 4 seconds after each request
-    client.delay_range = [2,4]
+    client.delay_range = [5, 7]
     client.login(USERNAME, PASSWORD)
-    
+
     try:
         main(client, args)
     except KeyboardInterrupt:
