@@ -35,11 +35,11 @@ if not os.path.exists(os.path.join(os.path.dirname(__file__), MESSAGE_FILE)):
 
 def main(client, args):
     """the chat bot loop"""
-    # load credentials and log in on instagram
-    if args.comment_chat_gpt:
-        lovespeech = LoveSpeech()
     # -----------------------------------------------------
     # runtime arguments
+    # -----------------------------------------------------
+    if args.comment_chat_gpt:
+        lovespeech = LoveSpeech()
     RUN = True
     N_MEDIA = args.n_media
     if args.n_runs is None:
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--comment_chat_gpt", action="store_true")
     args = parser.parse_args()
-
+    # load credentials and log in on instagram
     load_dotenv()
     USERNAME = os.getenv("INSTA_USER")
     PASSWORD = os.getenv("INSTA_PWD")
