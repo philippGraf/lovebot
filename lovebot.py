@@ -36,6 +36,7 @@ if not os.path.exists(os.path.join(os.path.dirname(__file__), MESSAGE_FILE)):
 
 def main(client, args):
     """the chat bot loop"""
+    os.system("clear")
     # -----------------------------------------------------
     # runtime arguments
     # -----------------------------------------------------
@@ -58,7 +59,7 @@ def main(client, args):
     hashtag_optimizer = HashtagOptimizer(alpha=5)
     # ------------------------------------------------------
 
-    selected_hashtag = args.hashtag
+    #selected_hashtag = args.hashtag
 
     # media_id buffer
     media_buffer = deque(maxlen=1000)
@@ -69,19 +70,19 @@ def main(client, args):
         # while other processes are adding both continuously.
         top = not top
         # Get Hashtag
-        if not selected_hashtag:
-            f = open(HASHTAG_FILE, "r")
-            # Read hashtags from file and remove the trailing '\n'.
-            all_hashtags = [hashtag[:-1] for hashtag in f.readlines()]
-            f.close()
-
-            #if len(all_hashtags) > number_of_hashtags:
-                # A new hashtag was added. Select the latest hashtag.
-            #    selected_hashtag = all_hashtags[-1]
-            #else:
-                # Let the hashtag optimizer select a hashtag.
+        #if not selected_hashtag:
+        f = open(HASHTAG_FILE, "r")
+        # Read hashtags from file and remove the trailing '\n'.
+        all_hashtags = [hashtag[:-1] for hashtag in f.readlines()]
+        f.close()
+        print(all_hashtags)
+        if len(all_hashtags) > number_of_hashtags:
+            # A new hashtag was added. Select the latest hashtag.
+            selected_hashtag = all_hashtags[-1]
+        else:
+            # Let the hashtag optimizer select a hashtag.
             selected_hashtag = hashtag_optimizer.select_hashtag(all_hashtags)
-            #number_of_hashtags = len(all_hashtags)
+        number_of_hashtags = len(all_hashtags)
 
         # Get all messages from file.
         f = open(MESSAGE_FILE, "r")
@@ -89,7 +90,6 @@ def main(client, args):
         messages = [message[:-1] for message in f.readlines()]
         f.close()
 
-        os.system("clear")
         print("[Lovebot]: Ich analysiere den Hashtag: ", "#" + selected_hashtag, "\n")
         sleep(1)
         if top:
