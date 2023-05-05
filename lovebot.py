@@ -94,14 +94,14 @@ def main(client, args):
         sleep(1)
         if top:
             print(f"[Lovebot]: Ich durchsuche {N_MEDIA} beliebte Beiträge...\n")
-            medias = client.hashtag_medias_top(selected_hashtag, amount=N_MEDIA)
+            #medias = client.hashtag_medias_top(selected_hashtag, amount=N_MEDIA)
         else:
             print(f"[Lovebot]: Ich durchsuche {N_MEDIA} aktuelle Beiträge...\n")
-            medias = client.hashtag_medias_recent(
-                selected_hashtag, amount=N_MEDIA
-            )  # here it would be also possible to sample from related hashtags and to scan them also
+            #medias = client.hashtag_medias_recent(
+            #    selected_hashtag, amount=N_MEDIA
+            #)  # here it would be also possible to sample from related hashtags and to scan them also
         number_of_hate_comments = 0
-
+        medias = []
         for media in medias:
             ANALYSE_MEDIA = True
             media_id = client.media_id(media.pk)
