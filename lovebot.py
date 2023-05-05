@@ -50,7 +50,13 @@ def main(client, args):
         N_RUNS = abs(args.n_runs)
 
     loop_counter = 0
-    number_of_hashtags = 0
+
+    f = open(HASHTAG_FILE, "r")
+    # Read hashtags from file and remove the trailing '\n'.
+    all_hashtags = [hashtag[:-1] for hashtag in f.readlines()]
+    f.close()
+
+    number_of_hashtags = len(all_hashtags)
     # ------------------------------------------------------
     # load the hatespeach detector
     detector = OpenAiModerator(debug=args.debug)
