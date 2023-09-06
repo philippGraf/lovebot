@@ -228,3 +228,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("[Lovebot]: Ich melde mich ab. Bis bald :)\n")
         client.logout()
+# little comment made with my mobile device ;)
+
